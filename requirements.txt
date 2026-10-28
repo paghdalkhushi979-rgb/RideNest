@@ -2,3 +2,4 @@ Flask
 qrcode[pil]
 reportlab
 APScheduler
+gunicorn
