@@ -1,0 +1,117 @@
+
+{% extends "base.html" %}
+
+{% block title %}Login | RideNest{% endblock %}
+
+{% block content %}
+
+<section class="auth auth-redesign">
+
+    <div class="auth-side auth-side-new">
+
+        <div class="auth-brand">
+            <span class="auth-brand-icon">R</span>
+            <span>Ride<span class="auth-brand-accent">Nest</span></span>
+        </div>
+
+        <p class="auth-eyebrow">YOUR JOURNEY CONTINUES</p>
+
+        <h2>Welcome<br>back.</h2>
+
+        <p class="auth-side-description">
+            Your next journey is just a few clicks away.
+            Log in to manage your bookings and get back on the road.
+        </p>
+
+        <div class="auth-benefits">
+
+            <div>
+                <span class="auth-check">✓</span>
+                <span>Manage your bookings easily</span>
+            </div>
+
+            <div>
+                <span class="auth-check">✓</span>
+                <span>Access your rental details</span>
+            </div>
+
+            <div>
+                <span class="auth-check">✓</span>
+                <span>Keep your journeys organised</span>
+            </div>
+
+        </div>
+
+        <p class="auth-side-footer">
+            YOUR RIDE. YOUR RULES.
+        </p>
+
+    </div>
+
+    <div class="auth-form auth-form-new">
+
+        <div class="auth-mobile-brand">
+            Ride<span>Nest</span>
+        </div>
+
+        <p class="auth-eyebrow">WELCOME TO RIDENEST</p>
+
+        <h2>Login to your account</h2>
+
+        <p class="auth-form-description">
+            Enter your details to continue your journey.
+        </p>
+
+        <form method="POST">
+
+            <div class="auth-field">
+                <label for="l-email">Email address</label>
+
+                <input
+                    id="l-email"
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    required
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="auth-field">
+                <label for="l-pass">Password</label>
+
+                <input
+                    id="l-pass"
+                    type="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <button class="btn btn-lg auth-submit" type="submit">
+                Login to RideNest <span>→</span>
+            </button>
+
+        </form>
+
+        <div class="auth-divider">
+            <span>NEW TO RIDENEST?</span>
+        </div>
+
+        <p class="auth-switch">
+            Don't have an account?
+            <a href="/register">Create account</a>
+        </p>
+
+        <p class="auth-security">
+            <span>✓</span> Your journey starts with a secure login.
+        </p>
+
+    </div>
+
+</section>
+
+{% endblock %}
+

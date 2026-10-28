@@ -1,0 +1,369 @@
+
+{% extends "base.html" %}
+
+{% block title %}RideNest | Every Ride. One Destination.{% endblock %}
+
+{% block content %}
+
+<!-- ================= HERO ================= -->
+<section class="de-hero">
+
+    <div class="de-hero-content" style="
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 100px 24px;
+        text-align: center;
+        box-sizing: border-box;
+    ">
+
+        <p class="de-eyebrow">WELCOME TO RIDENEST</p>
+
+        <h1 style="
+            font-size: clamp(48px, 8vw, 92px);
+            line-height: 1.08;
+            font-weight: 800;
+            letter-spacing: -2px;
+            margin: 24px auto;
+            max-width: 1000px;
+            text-align: center;
+        ">
+            Every Ride.
+            <span style="
+                display: block;
+                margin-top: 12px;
+            ">One Destination.</span>
+        </h1>
+
+        <p class="de-hero-text" style="
+            max-width: 650px;
+            margin: 24px auto 32px;
+            text-align: center;
+            line-height: 1.8;
+        ">
+            From cars and bikes to scooters and premium bus rentals,
+            find the perfect ride for every journey with RideNest.
+        </p>
+
+        <div class="de-hero-buttons" style="
+            justify-content: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        ">
+            <a href="#featured-car" class="de-btn de-btn-primary">
+                Explore Featured Ride
+            </a>
+
+            <a href="/login" class="de-btn de-btn-outline">
+                Login
+            </a>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FEATURED RIDE ================= -->
+{% if cars %}
+
+{% set featured = cars[0] %}
+
+<section class="de-featured" id="featured-car">
+
+    <div class="de-section-heading">
+        <p class="de-eyebrow">FEATURED RIDE</p>
+
+        <h2>Meet Your Next Ride.</h2>
+
+        <p>
+            One ride. One journey. A smarter way to travel.
+        </p>
+    </div>
+
+    <a href="/" class="de-featured-car">
+
+        <div class="de-car-image">
+
+            {% set image_map = {
+                'Swift': 'swift.jpg',
+                'Creta': 'creta.jpg',
+                'Innova Crysta': 'innova-crysta.jpg',
+                'City': 'city.jpg',
+                'Nexon EV': 'nexon-ev.jpg',
+                'Thar': 'thar.jpg',
+                'Activa 6G': 'activa-6g.jpg',
+                'Jupiter': 'jupiter.jpg',
+                'Bullet 350': 'bullet-350.jpg',
+                'Splendor': 'splendor.jpg',
+                'GIFT Ride E-bike 1': 'gift-ebike-1.jpg',
+                'GIFT Ride E-bike 2': 'gift-ebike-2.jpg'
+            } %}
+
+            {% set image_file = image_map.get(featured.name, featured.image) %}
+
+            {% if image_file %}
+                <img
+                    src="{{ url_for('static', filename='images/cars/' ~ image_file) }}"
+                    alt="{{ featured.brand }} {{ featured.name }}"
+                >
+            {% else %}
+                <div class="de-no-image">
+                    {{ featured.brand }} {{ featured.name }}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="de-car-info">
+
+            <p class="de-car-brand">{{ featured.brand }}</p>
+
+            <h3>{{ featured.name }}</h3>
+
+            <div class="de-car-details">
+                <span>{{ featured.seats }} Seats</span>
+                <span>{{ featured.type }}</span>
+                <span>{{ featured.fuel }}</span>
+            </div>
+
+            <div class="de-car-bottom">
+
+                <div>
+                    <small>Starting from</small>
+
+                    <strong>&#8377;{{ featured.price_per_day }}</strong>
+
+                    <small>/ day</small>
+                </div>
+
+                <span class="de-view-car">
+                    View All Vehicles →
+                </span>
+
+            </div>
+
+        </div>
+
+    </a>
+
+</section>
+
+{% endif %}
+
+
+<!-- ================= ABOUT ================= -->
+<section class="de-about">
+
+    <div class="de-about-content">
+
+        <p class="de-eyebrow">ABOUT RIDENEST</p>
+
+        <h2>
+            More Than Just
+            <span>A Rental Service.</span>
+        </h2>
+
+        <p>
+            RideNest makes vehicle rentals simple, transparent and convenient.
+            Find the right vehicle for your everyday travel, weekend getaway
+            or group journey.
+        </p>
+
+        <p>
+            From cars and bikes to scooters and premium bus rentals,
+            enjoy the freedom to choose your ride and travel your way.
+        </p>
+
+    </div>
+
+    <div class="de-about-stats">
+
+        <div>
+            <strong>01</strong>
+            <span>Easy Booking</span>
+        </div>
+
+        <div>
+            <strong>02</strong>
+            <span>Multiple Rides</span>
+        </div>
+
+        <div>
+            <strong>03</strong>
+            <span>Clear Pricing</span>
+        </div>
+
+        <div>
+            <strong>04</strong>
+            <span>Flexible Rentals</span>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= WHY RIDENEST ================= -->
+<section class="de-why">
+
+    <div class="de-section-heading">
+
+        <p class="de-eyebrow">WHY RIDENEST</p>
+
+        <h2>
+            Built Around
+            <span>Your Journey.</span>
+        </h2>
+
+    </div>
+
+    <div class="de-benefits">
+
+        <div class="de-benefit">
+            <span>01</span>
+            <h3>Simple Booking</h3>
+            <p>
+                Choose your ride, select your rental duration and
+                complete your booking with ease.
+            </p>
+        </div>
+
+        <div class="de-benefit">
+            <span>02</span>
+            <h3>Multiple Vehicles</h3>
+            <p>
+                Explore available cars, bikes, scooters and bus rental options.
+            </p>
+        </div>
+
+        <div class="de-benefit">
+            <span>03</span>
+            <h3>Transparent Pricing</h3>
+            <p>
+                Understand your rental charges before confirming your booking.
+            </p>
+        </div>
+
+        <div class="de-benefit">
+            <span>04</span>
+            <h3>Flexible Journeys</h3>
+            <p>
+                Find a suitable ride for daily travel, short trips or group travel.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="de-how">
+
+    <div class="de-section-heading">
+
+        <p class="de-eyebrow">HOW IT WORKS</p>
+
+        <h2>
+            Three Steps.
+            <span>One Easy Journey.</span>
+        </h2>
+
+    </div>
+
+    <div class="de-steps">
+
+        <div class="de-step">
+            <div class="de-step-number">01</div>
+            <h3>Choose</h3>
+            <p>Explore the available vehicles and select your preferred ride.</p>
+        </div>
+
+        <div class="de-step">
+            <div class="de-step-number">02</div>
+            <h3>Book</h3>
+            <p>Select your rental details and confirm your booking.</p>
+        </div>
+
+        <div class="de-step">
+            <div class="de-step-number">03</div>
+            <h3>Go</h3>
+            <p>Pick up your vehicle and enjoy your journey with RideNest.</p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= TRUST ================= -->
+<section class="de-trust">
+
+    <div>
+
+        <p class="de-eyebrow">TRAVEL WITH CONFIDENCE</p>
+
+        <h2>
+            Your Ride.
+            <span>Your Time.</span>
+            Your Journey.
+        </h2>
+
+        <p>
+            RideNest brings convenience and transparent rental management
+            together for a smoother vehicle rental experience.
+        </p>
+
+    </div>
+
+    <div class="de-trust-list">
+
+        <div>
+            <strong>✓</strong>
+            <span>Booking availability</span>
+        </div>
+
+        <div>
+            <strong>✓</strong>
+            <span>Convenient booking process</span>
+        </div>
+
+        <div>
+            <strong>✓</strong>
+            <span>Digital payment options</span>
+        </div>
+
+        <div>
+            <strong>✓</strong>
+            <span>Booking history and tracking</span>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= CTA ================= -->
+<section class="de-cta">
+
+    <p class="de-eyebrow">READY FOR YOUR NEXT JOURNEY?</p>
+
+    <h2>
+        Find Your Perfect
+        <span>Ride.</span>
+    </h2>
+
+    <p>
+        Explore our available vehicles and find the right ride for your plans.
+    </p>
+
+    <a href="/vehicles" class="de-btn de-btn-primary">
+        Explore All Vehicles →
+    </a>
+
+</section>
+
+{% endblock %}
+

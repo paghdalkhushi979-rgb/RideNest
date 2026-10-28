@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ kind }} check{% endblock %}
+{% block content %}
+<div class="form-box wide">
+    <h2>{{ kind }} check &middot; booking #{{ b.id }}</h2>
+    <p class="muted">{{ b.car_brand }} {{ b.car_name }} ({{ b.number_plate }}) &middot; {{ b.user_name }}, {{ b.user_phone }}</p>
+
+    {% if kind == 'Return' and pickup %}
+    <div class="summary">At pickup: odometer {{ pickup.odometer }} km, fuel {{ fuel_levels[pickup.fuel_level] }}{% if b.km_limit %} &middot; km allowed {{ b.km_limit }} (extra &#8377;{{ b.extra_km_rate }}/km){% endif %}{% if b.deposit %} &middot; deposit &#8377;{{ b.deposit }}{% endif %}</div>
+    {% elif kind == 'Return' %}
+    <div class="flash error">No pickup check was saved for this booking, so extra km and fuel charges cannot be calculated.</div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-grid">
+            <div><label>Fuel / battery level</label>
+                <select name="fuel">{% for label in fuel_levels %}<option value="{{ loop.index0 }}" {% if loop.last %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div><label>Odometer (km)</label><input type="number" name="odometer" min="0" required></div>
+            {% if b.category in ('Scooter', 'Bike') %}
+            <div><label>Helmets {% if kind == 'Pickup' %}given{% else %}returned{% endif %}</label>
+                <input type="number" name="helmets" min="0" max="4" value="{% if kind == 'Return' and pickup %}{{ pickup.helmets }}{% else %}1{% endif %}"></div>
+            {% endif %}
+            {% if kind == 'Return' %}
+            <div><label>Damage charge (&#8377;)</label><input type="number" name="damage_charge" min="0" value="0"></div>
+            {% endif %}
+        </div>
+
+        <label>Notes (scratches, dents, condition)</label>
+        <textarea name="notes" rows="3" maxlength="500"></textarea>
+
+        <label>Vehicle photos (up to 6)</label>
+        <input type="file" name="photos" accept="image/*" multiple>
+
+        {% if kind == 'Pickup' %}
+        <label>Customer driving licence photo (required)</label>
+        <input type="file" name="licence" accept="image/*" required>
+        {% endif %}
+
+        <button class="btn" type="submit">Save {{ kind|lower }} check{% if kind == 'Return' %} &amp; complete booking{% endif %}</button>
+    </form>
+    <p class="muted">Photos are private: only you and this customer can open them.</p>
+</div>
+{% endblock %}

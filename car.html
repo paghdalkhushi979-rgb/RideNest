@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}{{ car.brand }} {{ car.name }}{% endblock %}
+{% block content %}
+<a href="/" class="muted">&larr; All cars</a>
+<div class="detail">
+    <div class="car-img big">{% if car.image and car.image != 'default.jpg' %}<img src="{{ url_for('static', filename='images/cars/' ~ car.image) }}" alt="{{ car.brand }} {{ car.name }}">{% else %}{{ car.brand[0] }}{{ car.name[0] }}{% endif %}</div>
+    <div>
+        <h2>{{ car.brand }} {{ car.name }}</h2>
+        {% if rating.n %}<p class="stars">&#9733; {{ rating.avg }} <span class="muted">({{ rating.n }} reviews)</span></p>{% endif %}
+        {% if car.category == 'E-bike' %}
+            {% if riding %}<span class="badge red">In use</span>
+            {% elif car.station == OUT_OF_ZONE %}<span class="badge amber">Unavailable</span>
+            {% else %}<span class="badge green">Available at {{ car.station }}</span>{% endif %}
+        {% elif booked_till %}
+            <span class="badge red">{% if booked_till < now %}Not returned yet (due {{ booked_till }}){% else %}Booked till {{ booked_till }}{% endif %}</span>
+        {% else %}
+            <span class="badge green">Available now</span>
+        {% endif %}
+        <p class="price">&#8377;{{ car.price_per_day }} <span class="muted">/ day</span>{% if car.price_per_hour %} &middot; &#8377;{{ car.price_per_hour }} <span class="muted">/ hr</span>{% endif %}</p>
+
+        <table class="spec">
+            <tr><th>Category</th><td>{{ car.category }}</td></tr>
+            {% if car.category == 'E-bike' %}<tr><th>Parked at</th><td>{{ car.station }}</td></tr>{% endif %}
+            <tr><th>Type</th><td>{{ car.type }}</td></tr>
+            {% if car.price_per_hour %}<tr><th>Hourly rent</th><td>Min {{ car.min_hours }} hr, never more than the day rate</td></tr>{% endif %}
+            {% if car.outstation_rate %}<tr><th>Outstation</th><td>&#8377;{{ car.outstation_rate }}/day, {{ car.km_per_day }} km/day included, extra &#8377;{{ car.extra_km_rate }}/km</td></tr>{% endif %}
+            {% if car.deposit %}<tr><th>Security deposit</th><td>&#8377;{{ car.deposit }} (refundable)</td></tr>{% endif %}
+            <tr><th>Fuel</th><td>{{ car.fuel }}</td></tr>
+            <tr><th>Seats</th><td>{{ car.seats }}</td></tr>
+            <tr><th>Number plate</th><td>{{ car.number_plate }}</td></tr>
+            <tr><th>Kilometres driven</th><td>{{ car.km_driven }} km</td></tr>
+        </table>
+
+        <div class="row">{% if car.category == 'E-bike' %}
+            {% if riding or car.station == OUT_OF_ZONE %}<button class="btn btn-disabled" disabled>Not available</button>
+            {% else %}<a class="btn" href="/ride/start/{{ car.id }}">Start ride</a>{% endif %}
+            {% else %}<a class="btn" href="/book/{{ car.id }}">Book this car</a>{% endif %}
+        <a class="btn btn-outline" href="/passport/{{ car.qr_token }}">Car passport</a></div>
+    </div>
+</div>
+
+{% if car.category != 'E-bike' %}
+<h3>Already booked slots</h3>
+{% if slots %}
+<ul class="slots">
+    {% for s in slots %}
+    <li>{{ s.start_datetime }} &rarr; {{ s.end_datetime }}</li>
+    {% endfor %}
+</ul>
+<p class="muted">Aa time ma booking nahi thay. Baki badha time free che.</p>
+{% else %}
+<p class="muted">Koi booking nathi. Car badha time mate free che.</p>
+{% endif %}
+
+{% endif %}
+<h3>Reviews</h3>
+{% if reviews %}
+{% for r in reviews %}
+<div class="review">
+    <span class="stars">{{ '★' * r.rating }}{{ '☆' * (5 - r.rating) }}</span>
+    <strong>{{ r.user_name }}</strong> <span class="muted">{{ r.created_at[:10] }}</span>
+    {% if r.comment %}<p>{{ r.comment }}</p>{% endif %}
+</div>
+{% endfor %}
+{% else %}
+<p class="muted">No reviews yet.</p>
+{% endif %}
+{% endblock %}

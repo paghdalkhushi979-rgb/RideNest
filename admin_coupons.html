@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Coupons{% endblock %}
+{% block content %}
+<h2>Coupons</h2>
+<form method="POST" class="inline-form">
+    <div><label>Code</label><input type="text" name="code" maxlength="15" placeholder="DIWALI20" required></div>
+    <div><label>Discount %</label><input type="number" name="percent" min="1" max="90" required></div>
+    <div><label>Expiry (optional)</label><input type="date" name="expiry"></div>
+    <button class="btn" type="submit">Add coupon</button>
+</form>
+
+<div class="table-wrap"><table>
+    <tr><th>Code</th><th>Discount</th><th>Expiry</th><th>Status</th><th></th></tr>
+    {% for c in coupons %}
+    <tr>
+        <td><strong>{{ c.code }}</strong></td>
+        <td>{{ c.percent }}%</td>
+        <td>{{ c.expiry or 'No expiry' }}</td>
+        <td>{% if not c.active %}<span class="badge status-cancelled">Disabled</span>
+            {% elif c.expiry and c.expiry < today %}<span class="badge status-cancelled">Expired</span>
+            {% else %}<span class="badge green">Active</span>{% endif %}</td>
+        <td><form method="POST" action="/admin/coupons/{{ c.id }}/toggle"><button class="btn btn-small btn-outline" type="submit">{% if c.active %}Disable{% else %}Enable{% endif %}</button></form></td>
+    </tr>
+    {% endfor %}
+</table></div>
+{% endblock %}

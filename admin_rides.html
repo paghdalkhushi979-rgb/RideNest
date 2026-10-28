@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}E-bike rides{% endblock %}
+{% block head %}<meta http-equiv="refresh" content="60">{% endblock %}
+{% block content %}
+<h2>E-bike rides</h2>
+
+{% if outside %}
+<div class="alerts">
+    {% for c in outside %}<div class="alert-item">&#128681; {{ c.brand }} {{ c.name }} ({{ c.number_plate }}) was left outside GIFT City. Collect it, then set its parking zone: <a href="/admin/cars/{{ c.id }}/edit">Edit vehicle</a></div>{% endfor %}
+</div>
+{% endif %}
+
+<h3>Riding now ({{ active|length }})</h3>
+{% if active %}
+<div class="table-wrap"><table>
+    <tr><th>Ride</th><th>Rider</th><th>E-bike</th><th>Started</th><th>So far</th><th></th></tr>
+    {% for r in active %}
+    <tr>
+        <td>#{{ r.id }}</td>
+        <td>{{ r.user_name }}<br><span class="muted">{{ r.user_phone }}</span></td>
+        <td>{{ r.car_brand }} {{ r.car_name }}<br><span class="muted">{{ r.number_plate }}</span></td>
+        <td>{{ r.start_time[:16] }}<br><span class="muted">{{ r.start_station }}</span></td>
+        <td>{{ r.minutes }} min = &#8377;{{ r.amount }}</td>
+        <td><a class="btn btn-small btn-outline" href="/ride/end/{{ r.id }}">End ride</a></td>
+    </tr>
+    {% endfor %}
+</table></div>
+{% else %}<p class="muted">No e-bike is being ridden right now.</p>{% endif %}
+
+<h3>Recent rides</h3>
+{% if recent %}
+<div class="table-wrap"><table>
+    <tr><th>Ride</th><th>Rider</th><th>E-bike</th><th>Route</th><th>Time</th><th>Amount</th><th>Payment</th></tr>
+    {% for r in recent %}
+    <tr>
+        <td>#{{ r.id }}</td><td>{{ r.user_name }}</td><td>{{ r.car_name }}</td>
+        <td>{{ r.start_station }} &rarr; {{ r.end_station }}</td>
+        <td>{{ r.minutes }} min</td>
+        <td>&#8377;{{ r.ride_amount + r.zone_fee }}</td>
+        <td>{{ r.payment_status }}</td>
+    </tr>
+    {% endfor %}
+</table></div>
+{% else %}<p class="muted">No completed rides yet.</p>{% endif %}
+{% endblock %}

@@ -1,0 +1,720 @@
+{% extends "base.html" %}
+
+{% block title %}My Dashboard | DriveEasy{% endblock %}
+
+{% block head %}
+{% if auto_refresh %}
+<meta http-equiv="refresh" content="60">
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- HEADER -->
+    <div class="dashboard-header">
+
+        <div>
+            <span class="dashboard-eyebrow">DRIVE EASY ACCOUNT</span>
+
+            <h1>
+                Welcome back,
+                <span>{{ session.name }}</span>
+            </h1>
+
+            <p>
+                Manage your bookings, payments and journeys
+                from one place.
+            </p>
+        </div>
+
+        <a href="/vehicles" class="dashboard-book-btn">
+            Book a Car →
+        </a>
+
+    </div>
+
+
+    <!-- ALERTS -->
+{% if alerts %}
+
+    <div class="dashboard-alerts">
+
+        <div class="alert-heading">
+            <span>🔔</span>
+            <strong>Notifications</strong>
+        </div>
+
+    {% for n in alerts %}
+        <div class="dashboard-alert">
+            {{ n.message }}
+        </div>
+    {% endfor %}
+
+        <form
+            method="POST"
+            action="/notifications/read"
+        >
+            <button
+                class="dashboard-small-btn"
+                type="submit"
+            >
+                Mark all as read
+            </button>
+        </form>
+
+</div>
+
+{% endif %}
+
+
+    <!-- ADMIN -->
+    {% if session.role == 'admin' %}
+
+    <div class="dashboard-admin">
+
+        <div>
+            <span class="admin-label">ADMIN ACCOUNT</span>
+            <strong>You have administrator access.</strong>
+</div>
+
+        <a href="/admin">
+            Open Admin Panel →
+        </a>
+
+    </div>
+
+{% endif %}
+
+
+    <!-- STATS -->
+
+    <div class="dashboard-stats">
+
+        <div class="dashboard-stat-card">
+
+            <div class="stat-icon">
+                🚗
+            </div>
+
+            <div>
+                <strong>{{ total }}</strong>
+                <span>Total bookings</span>
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-stat-card">
+
+            <div class="stat-icon">
+                📅
+            </div>
+
+            <div>
+                <strong>{{ active }}</strong>
+                <span>Active / upcoming</span>
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-stat-card">
+
+            <div class="stat-icon">
+                ₹
+            </div>
+
+            <div>
+                <strong>₹{{ spent }}</strong>
+                <span>Total paid</span>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- BOOKINGS -->
+
+    <div class="dashboard-section">
+
+        <div class="dashboard-section-heading">
+
+            <div>
+                <span class="dashboard-eyebrow">
+                    YOUR JOURNEYS
+                </span>
+
+                <h2>My Bookings</h2>
+            </div>
+
+            <span class="booking-count">
+                {{ total }} booking{% if total != 1 %}s{% endif %}
+            </span>
+
+        </div>
+
+
+{% if bookings %}
+
+        <div class="dashboard-bookings">
+
+    {% for b in bookings %}
+
+            <div class="booking-card-dashboard">
+
+                <!-- CARD TOP -->
+
+                <div class="booking-card-top">
+
+                    <div>
+
+                        <span class="booking-number">
+                            BOOKING #{{ b.id }}
+                        </span>
+
+                        <h3>
+                            {{ b.car_brand }}
+                            {{ b.car_name }}
+                        </h3>
+
+                        <span class="plate-number">
+                            {{ b.number_plate }}
+                        </span>
+
+                    </div>
+
+
+                    <span class="dashboard-status status-{{ b.status|lower }}">
+
+                        {% if b.status == 'Pending'
+                              and b.approval_status == 'Waiting' %}
+
+                            Awaiting approval
+
+                        {% else %}
+
+                            {{ b.status }}
+
+                        {% endif %}
+
+                    </span>
+
+                </div>
+
+
+                <!-- JOURNEY -->
+
+                <div class="journey-info">
+
+                    <div class="journey-point">
+
+                        <span class="journey-label">
+                            PICKUP
+                        </span>
+
+                        <strong>
+                            {{ b.start_datetime }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="journey-line">
+                        →
+                    </div>
+
+
+                    <div class="journey-point">
+
+                        <span class="journey-label">
+                            RETURN
+                        </span>
+
+                        <strong>
+                            {{ b.end_datetime }}
+                        </strong>
+
+                        {% if b.status in ('Active', 'Confirmed') %}
+
+                        <span class="dashboard-countdown {{ b.countdown_class }}">
+                            {{ b.countdown }}
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- OUTSTATION -->
+
+                {% if b.trip_type == 'Outstation' %}
+
+                <div class="outstation-info">
+
+                    <strong>Outstation Trip</strong>
+
+                    <span>
+                        {{ b.destination }}
+                    </span>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- PRICE -->
+
+                <div class="booking-price-section">
+
+                    <div>
+
+                        <span class="price-label">
+                            RENTAL TOTAL
+                        </span>
+
+                        <strong class="booking-total">
+                            ₹{{ b.total_price }}
+                        </strong>
+
+                        {% if b.rate_note %}
+                        <span class="price-note">
+                            {{ b.rate_note }}
+                        </span>
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="booking-extra">
+
+                        {% if b.deposit %}
+
+                        <span>
+                            + ₹{{ b.deposit }} security deposit
+
+                            {% if b.status == 'Completed' %}
+                            (refund ₹{{ b.deposit_refund }})
+                            {% endif %}
+
+                        </span>
+
+                        {% endif %}
+
+
+                        {% if b.discount %}
+
+                        <span class="discount-text">
+                            {{ b.coupon_code }}:
+                            -₹{{ b.discount }}
+                        </span>
+
+                        {% endif %}
+
+
+                        {% if b.balance_due %}
+
+                        <span class="balance-warning">
+                            Balance due ₹{{ b.balance_due }}
+                        </span>
+
+                        {% endif %}
+
+
+                        {% if b.late_fee %}
+
+                        <span class="late-warning">
+                            + ₹{{ b.late_fee }} late fee
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- PAYMENT -->
+
+                <div class="booking-bottom">
+
+                    <div class="payment-status-dashboard">
+
+                        <span>Payment</span>
+
+                        <strong>
+                            {{ b.payment_status }}
+                        </strong>
+
+                    </div>
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="dashboard-actions">
+
+                        {% if b.status == 'Pending'
+                              and b.payment_status == 'Unpaid'
+                              and b.approval_status != 'Waiting' %}
+
+                        <a
+                            class="dashboard-action primary"
+                            href="/pay/{{ b.id }}"
+                        >
+                            Pay now
+                        </a>
+
+
+                        {% elif b.status == 'Pending'
+                              and b.approval_status == 'Waiting' %}
+
+                        <span class="waiting-text">
+                            Waiting for admin approval
+                        </span>
+
+
+            {% elif b.payment_status == 'Verifying' %}
+
+                        <a
+                            class="dashboard-action secondary"
+                            href="/pay/{{ b.id }}"
+                        >
+                            Verifying...
+                        </a>
+
+            {% endif %}
+
+
+            {% if b.status in ('Active', 'Completed') %}
+
+                        <a
+                            class="dashboard-action secondary"
+                            href="/booking/{{ b.id }}/inspection"
+                        >
+                            Checklist
+                        </a>
+
+            {% endif %}
+
+
+                        {% if b.status == 'Completed'
+                              and not b.reviewed %}
+
+                        <a
+                            class="dashboard-action secondary"
+                            href="/review/{{ b.id }}"
+                        >
+                            Rate
+                        </a>
+
+            {% endif %}
+
+
+            {% if b.payment_status == 'Paid' %}
+
+                        {% set wa =
+                        'Hello! My DriveEasy booking #' ~ b.id ~
+                        ' for ' ~ b.car_brand ~ ' ' ~ b.car_name ~
+                        ' (' ~ b.number_plate ~ ') is confirmed. Pickup: ' ~
+                        b.start_datetime ~ ' | Return: ' ~
+                        b.end_datetime ~ ' | Car passport: ' ~
+                        base ~ '/passport/' ~ b.qr_token ~
+                        ' | Invoice PDF: ' ~
+                        base ~ '/invoice/share/' ~
+                        share_token(b.id) ~ '.pdf'
+                        %}
+
+
+                        <a
+                            class="dashboard-action secondary"
+                            href="/invoice/{{ b.id }}.pdf?download=1"
+                        >
+                            Invoice PDF
+                        </a>
+
+
+                        <form
+                            method="POST"
+                            action="/invoice/{{ b.id }}/email"
+                        >
+                            <button
+                                class="dashboard-action secondary"
+                                type="submit"
+                            >
+                                Email me
+                            </button>
+                        </form>
+
+
+                        <a
+                            class="dashboard-action secondary"
+                            target="_blank"
+                            rel="noopener"
+                            href="https://wa.me/?text={{ wa|urlencode }}"
+                        >
+                            WhatsApp
+                        </a>
+
+            {% endif %}
+
+
+            {% if b.status in ('Pending', 'Confirmed') %}
+
+                        <a
+                            class="dashboard-action danger"
+                            href="/cancel/{{ b.id }}"
+                        >
+                            Cancel
+                        </a>
+
+            {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+    {% endfor %}
+
+</div>
+
+
+{% else %}
+
+        <div class="empty-dashboard">
+
+            <div class="empty-icon">
+                🚗
+            </div>
+
+            <h3>No bookings yet</h3>
+
+            <p>
+                Your next journey starts here.
+                Explore our cars and choose the one
+                that fits your trip.
+            </p>
+
+            <a href="/vehicles">
+                Explore Cars →
+            </a>
+
+        </div>
+
+{% endif %}
+
+    </div>
+
+
+    <!-- E-BIKE RIDES -->
+
+{% if rides %}
+
+    <div class="dashboard-section">
+
+        <div class="dashboard-section-heading">
+
+            <div>
+                <span class="dashboard-eyebrow">
+                    MICRO MOBILITY
+                </span>
+
+                <h2>My E-bike Rides</h2>
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-bookings">
+
+    {% for r in rides %}
+
+            <div class="booking-card-dashboard">
+
+                <div class="booking-card-top">
+
+                    <div>
+
+                        <span class="booking-number">
+                            RIDE #{{ r.id }}
+                        </span>
+
+                        <h3>
+                            {{ r.car_brand }}
+                            {{ r.car_name }}
+                        </h3>
+
+                        <span class="plate-number">
+                            {{ r.start_station }}
+
+                            {% if r.end_station %}
+                            → {{ r.end_station }}
+                            {% endif %}
+
+                        </span>
+
+                    </div>
+
+
+                    {% if r.status == 'Riding' %}
+
+                    <span class="dashboard-status status-active">
+                        Riding
+                    </span>
+
+                    {% else %}
+
+                    <span class="dashboard-status">
+                        {{ r.payment_status }}
+                    </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="ride-details">
+
+                    <div>
+                        <span>STARTED</span>
+                        <strong>{{ r.start_time[:16] }}</strong>
+                    </div>
+
+                    <div>
+                        <span>DURATION</span>
+                        <strong>{{ r.minutes }} min</strong>
+                    </div>
+
+                    <div>
+                        <span>AMOUNT</span>
+
+                        <strong>
+
+                            {% if r.status == 'Riding' %}
+
+                            ₹{{ r.ride_amount }} so far
+
+                            {% else %}
+
+                            ₹{{ r.ride_amount + r.zone_fee }}
+
+                            {% endif %}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                {% if r.zone_fee %}
+
+                <div class="ride-warning">
+                    + ₹{{ r.zone_fee }} out of zone
+                </div>
+
+                {% endif %}
+
+
+                <div class="booking-bottom">
+
+                    <div class="payment-status-dashboard">
+
+                        <span>Payment</span>
+
+                        <strong>
+                            {% if r.status == 'Riding' %}
+                            Riding
+                            {% else %}
+                            {{ r.payment_status }}
+                            {% endif %}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="dashboard-actions">
+
+                        {% if r.status == 'Riding' %}
+
+                        <a
+                            class="dashboard-action primary"
+                            href="/ride/end/{{ r.id }}"
+                        >
+                            End Ride
+                        </a>
+
+                        {% elif r.payment_status == 'Unpaid' %}
+
+                        <a
+                            class="dashboard-action primary"
+                            href="/ride/pay/{{ r.id }}"
+                        >
+                            Pay now
+                        </a>
+
+                        {% else %}
+
+                        <a
+                            class="dashboard-action secondary"
+                            href="/ride/pay/{{ r.id }}"
+                        >
+                            {% if r.payment_status == 'Paid' %}
+                            Receipt
+                            {% else %}
+                            Verifying...
+                            {% endif %}
+                        </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+    {% endfor %}
+
+        </div>
+
+    </div>
+
+{% endif %}
+
+
+    <!-- BOTTOM CTA -->
+
+    <div class="dashboard-cta">
+
+        <div>
+
+            <span class="dashboard-eyebrow">
+                READY FOR YOUR NEXT JOURNEY?
+            </span>
+
+            <h2>
+                Find your next ride.
+            </h2>
+
+            <p>
+                Choose a verified DriveEasy vehicle
+                and book your journey in minutes.
+            </p>
+
+        </div>
+
+        <a href="/vehicles">
+            Explore Fleet →
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

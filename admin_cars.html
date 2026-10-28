@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Manage cars{% endblock %}
+{% block content %}
+<div class="head-row">
+    <h2>Cars</h2>
+    <a class="btn btn-small" href="/admin/cars/add">+ Add car</a>
+</div>
+<div class="table-wrap"><table>
+    <tr><th>Photo</th><th>QR</th><th>Car</th><th>Plate</th><th>Rate/day</th><th>Bookings</th><th></th></tr>
+    {% for car in cars %}
+    <tr>
+        <td>{% if car.image != 'default.jpg' %}<img class="thumb" src="{{ url_for('static', filename='images/cars/' ~ car.image) }}" alt="{{ car.name }}">{% else %}<span class="muted">No photo</span>{% endif %}</td>
+        <td><img src="/qr/car/{{ car.qr_token }}.png" alt="QR for {{ car.name }}" width="64" height="64"></td>
+        <td>{{ car.brand }} {{ car.name }}<br><span class="muted">{{ car.category }} | {{ car.type }} | {{ car.fuel }} | {{ car.seats }} seats</span></td>
+        <td>{{ car.number_plate }}{% if car.station %}<br><span class="muted">{{ car.station }}</span>{% endif %}</td>
+        <td>&#8377;{{ car.price_per_day }}/day{% if car.price_per_hour %}<br>&#8377;{{ car.price_per_hour }}/hr{% endif %}</td>
+        <td>{{ car.booking_count }}</td>
+        <td class="actions">
+            <a class="btn btn-small btn-outline" href="/admin/cars/{{ car.id }}/edit">Edit</a>
+            <a class="btn btn-small btn-outline" href="/qr/car/{{ car.qr_token }}.png?download=1">QR</a>
+            <a class="btn btn-small btn-outline" href="/passport/{{ car.qr_token }}">Passport</a>
+            <a class="btn btn-small btn-danger" href="/admin/cars/{{ car.id }}/delete">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table></div>
+<p class="muted">A car with booking history cannot be deleted (to keep old invoices correct).</p>
+{% endblock %}

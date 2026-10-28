@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Rentals{% endblock %}
+{% block head %}<meta http-equiv="refresh" content="60">{% endblock %}
+{% block content %}
+<div class="head-row">
+    <h2>Rentals</h2>
+    <form method="POST" action="/admin/run-checks"><button class="btn btn-small btn-outline" type="submit">Run alert check now</button></form>
+</div>
+
+<h3 class="late-title">Late returns ({{ late|length }})</h3>
+{% if late %}
+<div class="table-wrap"><table>
+    <tr><th>#</th><th>Customer</th><th>Vehicle</th><th>Was due</th><th>Late fee now</th><th></th></tr>
+    {% for b in late %}
+    {% set wa = 'Hello ' ~ b.user_name ~ ', your DriveEasy rental of ' ~ b.car_brand ~ ' ' ~ b.car_name ~ ' (' ~ b.number_plate ~ ') was due at ' ~ b.end_datetime ~ '. Please return it as soon as possible. Late fee is running.' %}
+    <tr class="late-row">
+        <td>{{ b.id }}</td>
+        <td>{{ b.user_name }}<br><span class="muted">{{ b.user_phone }}</span></td>
+        <td>{{ b.car_brand }} {{ b.car_name }}<br><span class="muted">{{ b.number_plate }}</span></td>
+        <td>{{ b.end_datetime }}</td>
+        <td><strong>&#8377;{{ b.fee_now }}</strong></td>
+        <td class="actions">
+            <a class="btn btn-small" href="/admin/booking/{{ b.id }}/return">Return check</a>
+            <a class="btn btn-small btn-outline" target="_blank" rel="noopener" href="https://wa.me/91{{ b.user_phone }}?text={{ wa|urlencode }}">WhatsApp</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table></div>
+{% else %}<p class="muted">No late returns.</p>{% endif %}
+
+<h3>With customers now ({{ active|length }})</h3>
+{% if active %}
+<div class="table-wrap"><table>
+    <tr><th>#</th><th>Customer</th><th>Vehicle</th><th>Return time</th><th></th></tr>
+    {% for b in active %}
+    <tr>
+        <td>{{ b.id }}</td>
+        <td>{{ b.user_name }}<br><span class="muted">{{ b.user_phone }}</span></td>
+        <td>{{ b.car_brand }} {{ b.car_name }}<br><span class="muted">{{ b.number_plate }}</span>
+            {% if b.trip_type == 'Outstation' %}<br><span class="badge amber">Outstation: {{ b.destination }}</span>{% endif %}</td>
+        <td>{{ b.end_datetime }}<br><span class="countdown {{ b.countdown_class }}">{{ b.countdown }}</span></td>
+        <td class="actions">
+            {% if not b.picked %}<a class="btn btn-small btn-outline" href="/admin/booking/{{ b.id }}/pickup">Pickup check</a>
+            {% else %}<a class="btn btn-small btn-outline" href="/booking/{{ b.id }}/inspection">Checklist</a>{% endif %}
+            <a class="btn btn-small" href="/admin/booking/{{ b.id }}/return">Return check</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table></div>
+{% else %}<p class="muted">No vehicles are out right now.</p>{% endif %}
+
+<h3>Upcoming confirmed ({{ upcoming|length }})</h3>
+{% if upcoming %}
+<div class="table-wrap"><table>
+    <tr><th>#</th><th>Customer</th><th>Vehicle</th><th>Pickup</th><th>Return</th><th></th></tr>
+    {% for b in upcoming %}
+    <tr><td>{{ b.id }}</td><td>{{ b.user_name }}<br><span class="muted">{{ b.user_phone }}</span></td>
+        <td>{{ b.car_brand }} {{ b.car_name }}{% if b.trip_type == 'Outstation' %}<br><span class="badge amber">Outstation: {{ b.destination }}</span>{% endif %}</td>
+        <td>{{ b.start_datetime }}</td><td>{{ b.end_datetime }}</td>
+        <td><a class="btn btn-small btn-outline" href="/admin/booking/{{ b.id }}/pickup">Pickup check</a></td></tr>
+    {% endfor %}
+</table></div>
+{% else %}<p class="muted">Nothing upcoming.</p>{% endif %}
+
+{% endblock %}

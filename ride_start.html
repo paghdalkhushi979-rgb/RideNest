@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Start ride{% endblock %}
+{% block content %}
+<div class="form-box">
+    <h2>Start ride: {{ bike.brand }} {{ bike.name }}</h2>
+    <p class="muted">Parked at <strong>{{ bike.station }}</strong> &middot; {{ bike.number_plate }}</p>
+    <table class="spec">
+        <tr><th>Rate</th><td>&#8377;{{ bike.price_per_hour }} per hour, charged per minute</td></tr>
+        <tr><th>Minimum</th><td>{{ min_minutes }} minutes</td></tr>
+        <tr><th>Daily cap</th><td>&#8377;{{ bike.price_per_day }} per 24 hours</td></tr>
+        <tr><th>Return</th><td>Inside GIFT City zones only. Ending the ride outside costs a &#8377;{{ out_fee }} fee.</td></tr>
+    </table>
+    <form method="POST">
+        <label class="radio"><input type="checkbox" name="agree" value="1" required> I will wear a helmet, follow traffic rules and park inside GIFT City.</label>
+        <button class="btn" type="submit">Start ride now</button>
+    </form>
+</div>
+{% endblock %}

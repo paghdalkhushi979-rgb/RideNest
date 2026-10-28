@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}End ride{% endblock %}
+{% block content %}
+<div class="form-box">
+    <h2>End ride #{{ ride.id }}</h2>
+    <p class="muted">{{ ride.car_brand }} {{ ride.car_name }} &middot; started {{ ride.start_time[:16] }} at {{ ride.start_station }}</p>
+    <div class="summary">So far: <strong>{{ minutes }} min = &#8377;{{ amount }}</strong><br><span class="muted">{{ note }}</span></div>
+    <form method="POST">
+        <label>Where did you park?</label>
+        <select name="zone" required>
+            <option value="">Select parking zone</option>
+            {% for z in zones %}<option value="{{ z }}">{{ z }}</option>{% endfor %}
+            <option value="{{ out_zone }}">{{ out_zone }} (+ &#8377;{{ out_fee }} fee)</option>
+        </select>
+        <button class="btn" type="submit">End ride &amp; see bill</button>
+    </form>
+    <p class="muted">The bill is made at the moment you press the button.</p>
+</div>
+{% endblock %}

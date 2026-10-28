@@ -1,0 +1,132 @@
+
+{% extends "base.html" %}
+{% block title %}Admin Dashboard | RideNest{% endblock %}
+
+{% block content %}
+<h2>Admin dashboard</h2>
+
+<div class="stats">
+    <div class="stat">
+        <strong>&#8377;{{ stats.earning }}</strong>
+        <span>Total earning</span>
+    </div>
+    <div class="stat">
+        <strong>{{ stats.bookings }}</strong>
+        <span>Total bookings</span>
+    </div>
+    <div class="stat">
+        <strong>{{ stats.out }}</strong>
+        <span>Vehicles out now</span>
+    </div>
+    <div class="stat">
+        <strong>{{ stats.rides }}</strong>
+        <span>E-bike rides</span>
+    </div>
+    <div class="stat">
+        <strong>{{ stats.cars }}</strong>
+        <span>Cars</span>
+    </div>
+    <div class="stat">
+        <strong>{{ stats.users }}</strong>
+        <span>Customers</span>
+    </div>
+</div>
+
+{% if stats.late or stats.verify or stats.approvals %}
+<div class="alerts">
+
+    {% if stats.approvals %}
+    <div class="alert-item">
+        &#128668; {{ stats.approvals }} outstation request(s) waiting for approval.
+        <a href="/admin/approvals">Review</a>
+    </div>
+    {% endif %}
+
+    {% if stats.verify %}
+    <div class="alert-item">
+        &#128179; {{ stats.verify }} payment(s) waiting for verification.
+        <a href="/admin/payments">Verify now</a>
+    </div>
+    {% endif %}
+
+    {% if stats.late %}
+    <div class="alert-item">
+        &#128680; {{ stats.late }} car(s) not returned on time.
+        <a href="/admin/bookings">See late returns</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endif %}
+
+<div class="two-col">
+
+    <div class="card">
+        <h3>Revenue by month</h3>
+
+        {% for bar in revenue_bars %}
+        <div class="bar-row">
+            <span class="bar-label">{{ bar.label }}</span>
+
+            <div class="bar">
+                <progress
+                    class="bar-progress"
+                    value="{{ bar.pct | int }}"
+                    max="100">
+                </progress>
+            </div>
+
+            <strong>&#8377;{{ bar.value }}</strong>
+        </div>
+        {% else %}
+        <p class="muted">No paid bookings yet.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <h3>Bookings by status</h3>
+
+        {% for bar in status_bars %}
+        <div class="bar-row">
+            <span class="bar-label">{{ bar.label }}</span>
+
+            <div class="bar">
+                <progress
+                    class="bar-progress alt"
+                    value="{{ bar.pct | int }}"
+                    max="100">
+                </progress>
+            </div>
+
+            <strong>{{ bar.value }}</strong>
+        </div>
+        {% else %}
+        <p class="muted">No bookings yet.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+<h3>Most booked cars</h3>
+
+<div class="table-wrap">
+    <table>
+        <tr>
+            <th>Car</th>
+            <th>Bookings</th>
+        </tr>
+
+        {% for c in top_cars %}
+        <tr>
+            <td>{{ c.car }}</td>
+            <td>{{ c.c }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="2">No bookings yet.</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>{% block title %}RideNest | Every Ride. One Destination.{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+
+<nav class="nav">
+
+    <a class="logo" href="/">
+        <span class="logo-mark">R</span>
+        <span>Ride<span class="logo-accent">Nest</span></span>
+    </a>
+
+    <div class="nav-links">
+
+        <a href="/">Vehicles</a>
+
+        {% if session.user_id %}
+
+            <a href="/dashboard">Dashboard</a>
+
+            {% if session.role == 'admin' %}
+
+            <a href="/admin">Admin</a>
+            <a href="/admin/bookings">Rentals</a>
+            <a href="/admin/rides">Rides</a>
+            <a href="/admin/approvals">Approvals</a>
+            <a href="/admin/payments">Payments</a>
+            <a href="/admin/cars">Vehicles</a>
+            <a href="/admin/users">Users</a>
+            <a href="/admin/coupons">Coupons</a>
+
+            {% endif %}
+
+            <a href="/logout" class="btn btn-small nav-cta">
+                Logout
+            </a>
+
+        {% else %}
+
+            <a href="/login">Login</a>
+
+            <a href="/register" class="btn btn-small nav-cta">
+                Register
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</nav>
+
+
+<main class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% for category, message in messages %}
+
+            <div class="flash {{ category }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+</main>
+
+
+<footer class="footer">
+
+    <div class="footer-inner">
+
+        <div>
+
+            <div class="footer-logo">
+                Ride<span>Nest</span>
+            </div>
+
+            <p>
+                Every ride. One destination. Better journeys.
+            </p>
+
+        </div>
+
+        <div class="footer-meta">
+
+            <span>RideNest Vehicle Rentals</span>
+            <span>© 2026</span>
+
+        </div>
+
+    </div>
+
+</footer>
+
+</body>
+</html>
+

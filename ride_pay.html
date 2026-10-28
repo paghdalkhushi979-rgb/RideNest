@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Ride #{{ ride.id }}{% endblock %}
+{% block content %}
+<div class="form-box pay-box">
+    <h2>Ride #{{ ride.id }} &middot; &#8377;{{ total }}</h2>
+    <table class="spec">
+        <tr><th>E-bike</th><td>{{ ride.car_brand }} {{ ride.car_name }}</td></tr>
+        <tr><th>From</th><td>{{ ride.start_station }} ({{ ride.start_time[:16] }})</td></tr>
+        <tr><th>To</th><td>{{ ride.end_station }} ({{ ride.end_time[:16] }})</td></tr>
+        <tr><th>Time</th><td>{{ ride.minutes }} min</td></tr>
+        <tr><th>Ride charge</th><td>&#8377;{{ ride.ride_amount }} <span class="muted">({{ ride.note }})</span></td></tr>
+        {% if ride.zone_fee %}<tr><th>Out-of-zone fee</th><td>&#8377;{{ ride.zone_fee }}</td></tr>{% endif %}
+    </table>
+
+    {% if ride.payment_status == 'Unpaid' %}
+    <div class="qr-wrap"><img src="data:image/png;base64,{{ qr_data }}" alt="UPI payment QR code" width="220" height="220"></div>
+    <p class="center muted">Scan with any UPI app (GPay, PhonePe, Paytm)</p>
+    <p class="center"><a class="btn btn-outline btn-small" href="{{ upi_link }}">Open UPI app on this phone</a></p>
+    <form method="POST">
+        <label>UTR / Transaction ID (12 digits)</label>
+        <input type="text" name="utr" maxlength="12" inputmode="numeric" pattern="[0-9]{12}" required>
+        <button class="btn" type="submit">I have paid</button>
+    </form>
+    {% elif ride.payment_status == 'Verifying' %}
+    <div class="flash success">Payment submitted (UTR {{ ride.utr_number }}). Waiting for admin to verify.</div>
+    {% else %}
+    <div class="flash success">Paid. Thank you for riding!</div>
+    <p><a class="btn btn-small" href="/ride/{{ ride.id }}/receipt.pdf?download=1">Download receipt</a></p>
+    <form class="mail-form" method="POST" action="/ride/{{ ride.id }}/email" style="justify-content:flex-start">
+        <input type="email" name="email" placeholder="Email to send the receipt" aria-label="Email address for the receipt" required>
+        <button class="btn btn-small btn-outline" type="submit">Email receipt</button>
+    </form>
+    {% endif %}
+    <p><a href="/dashboard">&larr; Dashboard</a></p>
+</div>
+{% endblock %}

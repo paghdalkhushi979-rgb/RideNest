@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} | DriveEasy{% endblock %}
+
+{% block content %}
+
+<div class="confirm-page">
+
+    <div class="confirm-card">
+
+        <!-- ICON -->
+        <div class="confirm-icon">
+            ?
+        </div>
+
+        <!-- TEXT -->
+        <div class="confirm-content">
+
+            <span class="confirm-eyebrow">
+                DRIVE EASY
+            </span>
+
+            <h1>{{ title }}</h1>
+
+            <p class="confirm-message">
+                {{ message }}
+            </p>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+        <form
+            method="POST"
+            action="{{ action_url }}"
+            class="confirm-form"
+        >
+
+            <button
+                class="confirm-danger"
+                type="submit"
+            >
+                {{ button }}
+            </button>
+
+            <a
+                class="confirm-back"
+                href="{{ back }}"
+            >
+                No, go back
+            </a>
+
+    </form>
+
+
+        <!-- NOTE -->
+        <div class="confirm-note">
+            <span>✓</span>
+            Please review your booking before continuing.
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

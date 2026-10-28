@@ -1,0 +1,221 @@
+
+{% extends "base.html" %}
+
+{% block title %}Browse Vehicles | RideNest{% endblock %}
+
+{% block content %}
+
+<section class="page-head">
+    <p class="de-eyebrow">RIDENEST FLEET</p>
+    <h1>
+        {% if cat %}
+            {% for value, label in categories %}
+                {% if cat == value %}{{ label }}{% endif %}
+            {% endfor %}
+        {% else %}
+            All Vehicles
+        {% endif %}
+    </h1>
+    <p class="muted">{{ total }} vehicle{{ '' if total == 1 else 's' }} found</p>
+</section>
+
+<form class="filters" method="GET" action="/vehicles">
+    {% if cat %}
+        <input type="hidden" name="cat" value="{{ cat }}">
+    {% endif %}
+
+    <div>
+        <label>Search</label>
+        <input type="search" name="q" value="{{ q }}" placeholder="Brand or model">
+    </div>
+
+    <div>
+        <label>Type</label>
+        <select name="type">
+            <option value="">Any</option>
+            {% for t in types %}
+                <option value="{{ t }}" {% if vtype == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label>Fuel</label>
+        <select name="fuel">
+            <option value="">Any</option>
+            {% for f in fuels %}
+                <option value="{{ f }}" {% if fuel == f %}selected{% endif %}>{{ f }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label>Sort By</label>
+        <select name="sort">
+            <option value="" {% if not sort %}selected{% endif %}>Recommended</option>
+            <option value="price_asc" {% if sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_desc" {% if sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+            <option value="rating" {% if sort == 'rating' %}selected{% endif %}>Top Rated</option>
+            <option value="new" {% if sort == 'new' %}selected{% endif %}>Newest</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Pickup</label>
+        <input type="datetime-local" name="start"
+               value="{{ search_start }}" min="{{ now_input }}">
+    </div>
+
+    <div>
+        <label>Return</label>
+        <input type="datetime-local" name="end"
+               value="{{ search_end }}" min="{{ now_input }}">
+    </div>
+
+    <button class="btn" type="submit">Apply Filters</button>
+    <a class="btn btn-outline" href="/vehicles">Reset</a>
+</form>
+
+<div class="tabs">
+    <a class="tab {% if not cat %}active{% endif %}" href="/vehicles">All</a>
+    {% for value, label in categories %}
+        <a class="tab {% if cat == value %}active{% endif %}"
+           href="/vehicles?cat={{ value | urlencode }}">{{ label }}</a>
+    {% endfor %}
+</div>
+
+{% if cars %}
+<section class="grid">
+
+    {% for car in cars %}
+
+    {% set image_map = {
+        'Swift':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTD4gHq6BXtiwZcEBrt4mBdqW16QwzmlVDk_MZlqZrMpQ&s=10 ',
+        'Wagon R': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPk6TDqxAscdiyTQ9tJKGnNXQsbNkW-mfT5aU_IMRCTQ&s=10',
+        'Tiago': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMWOIDwWVSacPI8WJscbnHDoZ-t98bQ2aQ_s2ixS00cg&s=10',
+        'i20': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSphjiiqZ8jyjtjs77rAIXF3IFAhHPC-cF2PdGmBDwn1A&s=10',
+        'Dzire':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSC09-PbhosQIZ8pmuTzNHJTzOLhq09JsD3JS1CEEquA&s=10',
+        'Verna': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZZHkVdLsaqR2HOzpJdxyxvrSs_0JhxXenuIl2Wmqjiw&s=10',
+        'Slavia': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQwjFhd_r16oxcodNtmksrcRMRzWplhsiVeCoPBvMSDTg&s=10',
+        'Tigor EV': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTuPGOGgPvygb4_nnhCwIQMaxxSb3xwhAFGLHZCbq6_YQ&s=10',
+        'Punch': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6Pllrjawyag7wm1z0puGfTAPD6JF40nf-UyxjIHFocA&s=10',
+        'Venue': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvZauONU4fB84aGF22pdRh-7wnBp8pqcADvqlxE4ra9g&s=10',
+        'Brezza' : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRJL4MN_rMUH1qFcm8qSjL7sLzLNBt4pGUq4BBrp_anlw&s=10',
+        'Scorpio-N': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTB1JkDAtFey5SJzH9Y73YDYlWBc_cE7SWtzmjdwiPJgg&s=10',
+        'XUV700': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrPm8KYn0YaAGkculEcjtJafSt8GImMLb85aY5OzI7GA&s=10',
+        'Fortuner': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVy9T2YnX2PauT8QuF3Slg_l_5koqZkITtrTxh5mu67w&s=10',
+        'Ertiga':  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTG23xJwjFCtYl_bX9l2jvUPAyv_S6cjgRSzYHBf9BQow&s=10',
+        'Carens': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQz2ldR3op0WhVrU_OVquvlXMKk3ZnH4LyojFAL-fwg3A&s=10',
+        '3 Series' : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJdAG4TOV2DzFA3-V3_xiiUJZUiTnNVuNe3nbfSXqYwg&s',
+        'C-Class': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxZFQZOzeLZ_dFhSljNhYlbYYJXH4PkXlSUTp8fTz27Q&s=10',
+        'Dio': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQU8tDvsZTgSfUcPteujjYnQ0jol5h_sidVM24KlG3YCw&s=10',
+        'Jupiter':'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrxPm3M6o_sjEgUxfCaegFWNe9xo-BI3GS6mS3fO2axQ&s=10',
+        'Ntorq 125': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPzlffuIL3895hlI-JKuJZmKP36aTpMLsT27ZAEGo5pQ&s=10',
+        'Access 125': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR875_-9w4JGIj5dBYmXl-AGgfK4MIt76TOOrnoUgr6Cw&s=10',
+        'Fascino': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSimQcAaICpk77QEkIsU6zOiOmVtQvppwrGp92HV3UXcQ&s=10',
+        'Chetak': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQF5-R0mlJVlmlEw3yXkzkspXkcn4xZU_X4QqAM7gmfKg&s=10',
+        'S1 Pro': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpKAFXw0tLAhPatutkApd8DMbwNFOK-l8WiInFBqYWBA&s=10',
+        'Splendor': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTXZmv03R_7RjKx51SgJkeqK0KZiBtiQtwWBZ1wnSlqXQ&s=10',
+        'Shine': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRZo8Lap4wPezQ9r4aW01-xnPJgxt3kHaaLkodKp8-bQ&s=10',
+        'Pulsar 150': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSlk-j4GlmsGrBzBFgGHMso0nngLtJNZcrK1njaED5Wdw&s=10',
+        'FZ-S': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYHYH7MjamQqsX0y4Fr88YnSJiVLstO5l5bTnxOxj2VA&s=10',
+        'Apache RTR 160': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThleZnkrzZ-xJI5IvcIqGvwTLtWJHQO3oihHFlWCWkfw&s=10',
+        'Xtreme 160R': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVMkfETK9Q62MnBn7eeyeeVoVhIkwBWV3ktTLIyfWW0Q&s=10',
+        'Duke 200': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKQjq_0fhuv4VUyoigP0jHHfAaNswqdC_9r7Rcb1xIlQ&s=10',
+        'Hunter 350': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOgAS8wLHIi6zLaSxsF1DtYDlfsdsPFckI_irS9RILWA&s',
+        'Bullet 350': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWBHjQvnnvIsF7s-TdsL7Q1-tsD17CdB7bXzzy2Uglbw&s=10',
+        'Himalayan': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2eDSHtoGOeOsFSUf2FTfWHNpvf5v8o5hDkuCk7YOgZA&s=10',
+        
+        'Creta': 'https://commons.wikimedia.org/wiki/Special:FilePath/2024_Hyundai_Creta_1.5_MPi_SX(O)_(India)_front_view.png?width=1200',
+        'Innova Crysta': 'https://commons.wikimedia.org/wiki/Special:FilePath/Toyota_Innova_Crysta.jpg?width=1200',
+        'City': 'https://commons.wikimedia.org/wiki/Special:FilePath/HondaCityIndiaAsia.jpg?width=1200',
+        'Nexon EV': 'https://commons.wikimedia.org/wiki/Special:FilePath/2020_Tata_Nexon_EV_(India)_front_view.png?width=1200',
+        'Thar': 'https://commons.wikimedia.org/wiki/Special:FilePath/Mahindra_Thar.jpg?width=1200',
+        'Activa 6G': 'https://commons.wikimedia.org/wiki/Special:FilePath/Honda_Activa_6G.jpg?width=1200',
+        'Tata Tiago': 'https://commons.wikimedia.org/wiki/Special:FilePath/Tata_tiago.jpg?width=1200',
+        'Kia Carens': 'https://commons.wikimedia.org/wiki/Special:FilePath/2022_Kia_Carens_1.4_(India)_front_view_01.jpg?width=1200',
+        'Classic 350': 'https://commons.wikimedia.org/wiki/Special:FilePath/Royal_Enfield_Classic_350.jpg?width=1200',
+        'Royal Enfield Classic 350': 'https://commons.wikimedia.org/wiki/Special:FilePath/Royal_Enfield_Classic_350.jpg?width=1200'
+    } %}
+
+    {% set image_url = image_map.get(car.name) %}
+
+    <article class="card">
+        <div class="car-image-wrap">
+
+            {% if image_url %}
+                <img
+                    src="{{ image_url }}"
+                    alt="{{ car.brand }} {{ car.name }}"
+                    class="car-photo"
+                    loading="lazy"
+                    onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';"
+                >
+                <div class="car-photo no-image" style="display:none;">
+                    {{ car.brand }} {{ car.name }}
+                </div>
+
+            {% elif car.image and car.image != 'default.jpg' %}
+                <img
+                    src="{{ url_for('static', filename='images/cars/' ~ car.image) }}"
+                    alt="{{ car.brand }} {{ car.name }}"
+                    class="car-photo"
+                    loading="lazy"
+                    onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex';"
+                >
+                <div class="car-photo no-image" style="display:none;">
+                    {{ car.brand }} {{ car.name }}
+                </div>
+
+            {% else %}
+                <div class="car-photo no-image">
+                    {{ car.brand }} {{ car.name }}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="card-body">
+            <p class="muted">{{ car.brand }}</p>
+            <h2>{{ car.name }}</h2>
+
+            <div class="car-meta">
+                <span>{{ car.seats }} Seats</span>
+                <span>{{ car.type }}</span>
+                <span>{{ car.fuel }}</span>
+            </div>
+
+            <div class="card-bottom">
+                <div>
+                    <small>Starting from</small>
+                    <strong>&#8377;{{ car.price_per_day }}</strong>
+                    <small>/ day</small>
+                </div>
+
+                {% if car.clash %}
+                    <span class="badge badge-red">Unavailable</span>
+                {% else %}
+                    <span class="badge badge-green">Available</span>
+                {% endif %}
+            </div>
+
+            <a href="{{ url_for('car_detail', car_id=car.id) }}"
+               class="btn">View Vehicle →</a>
+        </div>
+    </article>
+
+    {% endfor %}
+</section>
+
+{% else %}
+<div class="empty">
+    <h2>No vehicles found</h2>
+    <p class="muted">Try different filters or dates.</p>
+    <a href="/vehicles" class="btn">Clear Filters</a>
+</div>
+{% endif %}
+
+
+
+
+{% endblock %}

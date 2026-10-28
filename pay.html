@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+
+{% block title %}Payment | DriveEasy{% endblock %}
+
+{% block content %}
+
+<div class="payment-page">
+
+    <!-- HEADER -->
+    <div class="payment-header">
+        <div>
+            <p class="payment-eyebrow">SECURE PAYMENT</p>
+            <h1>Complete Your Payment</h1>
+            <p class="payment-subtitle">
+                Secure your DriveEasy booking and get ready for your journey.
+            </p>
+        </div>
+
+        <div class="payment-status">
+            <span class="status-dot"></span>
+            Booking Reserved
+        </div>
+    </div>
+
+
+    <div class="payment-layout">
+
+        <!-- LEFT SIDE -->
+        <div class="payment-main">
+
+            <!-- BOOKING CARD -->
+            <div class="payment-card">
+
+                <div class="payment-card-title">
+                    <div>
+                        <span class="small-label">BOOKING DETAILS</span>
+                        <h2>#DRV{{ booking.id }}</h2>
+                    </div>
+
+                    <span class="booking-badge">DriveEasy</span>
+                </div>
+
+                <div class="booking-car-info">
+
+                    <div class="car-placeholder">
+                        🚗
+                    </div>
+
+                    <div>
+                        <p class="small-label">YOUR CAR</p>
+
+                        <h3>
+                            {{ booking.car_brand }}
+                            {{ booking.car_name }}
+                        </h3>
+
+                        <p class="muted">
+                            Premium rental vehicle
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="booking-times">
+
+                    <div class="time-box">
+                        <span class="small-label">PICKUP</span>
+                        <strong>{{ booking.start_datetime }}</strong>
+                    </div>
+
+                    <div class="time-arrow">
+                        →
+                    </div>
+
+                    <div class="time-box">
+                        <span class="small-label">RETURN</span>
+                        <strong>{{ booking.end_datetime }}</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- PAYMENT CARD -->
+            {% if booking.payment_status == 'Unpaid' %}
+
+            <div class="payment-card">
+
+                <div class="section-heading">
+                    <div>
+                        <span class="small-label">PAYMENT METHOD</span>
+                        <h2>Pay with UPI</h2>
+                    </div>
+
+                    <span class="upi-badge">UPI</span>
+                </div>
+
+
+                <div class="qr-payment">
+
+                    <div class="qr-section">
+
+                        <div class="qr-frame">
+                            <img
+                                src="data:image/png;base64,{{ qr_data }}"
+                                alt="UPI payment QR code"
+                                width="220"
+                                height="220"
+                            >
+                        </div>
+
+                        <p class="qr-title">
+                            Scan & Pay
+                        </p>
+
+                        <p class="muted qr-text">
+                            Scan this QR using GPay, PhonePe,
+                            Paytm or another UPI app.
+                        </p>
+
+                        <a
+                            class="upi-button"
+                            href="{{ upi_link }}"
+                        >
+                            Open UPI App
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- UTR FORM -->
+            <div class="payment-card">
+
+                <div class="section-heading">
+                    <div>
+                        <span class="small-label">PAYMENT CONFIRMATION</span>
+                        <h2>Enter Transaction ID</h2>
+                    </div>
+                </div>
+
+                <p class="muted">
+                    After completing the payment, enter your
+                    12-digit UTR / Transaction ID below.
+                </p>
+
+
+                <form method="POST" class="utr-form">
+
+                    <label>
+                        UTR / Transaction ID
+                    </label>
+
+                    <input
+                        type="text"
+                        name="utr"
+                        maxlength="12"
+                        inputmode="numeric"
+                        pattern="[0-9]{12}"
+                        placeholder="Enter 12-digit transaction ID"
+                        required
+                    >
+
+                    <button
+                        class="payment-button"
+                        type="submit"
+                    >
+                        I Have Paid →
+                    </button>
+
+    </form>
+
+            </div>
+
+
+            <!-- TIMER -->
+            <div class="payment-warning">
+
+                <div class="warning-icon">
+                    ⏱
+                </div>
+
+                <div>
+                    <strong>Payment window</strong>
+
+                    <p>
+                        You have approximately
+                        <strong>{{ minutes_left }} minute(s)</strong>
+                        left to complete the payment.
+                        After this time, the booking will be
+                        cancelled automatically.
+                    </p>
+                </div>
+
+            </div>
+
+
+    {% else %}
+
+            <!-- PAYMENT SUBMITTED -->
+            <div class="payment-success">
+
+                <div class="success-icon">
+                    ✓
+                </div>
+
+                <div>
+                    <span class="small-label">
+                        PAYMENT RECEIVED
+                    </span>
+
+                    <h2>Payment Submitted Successfully</h2>
+
+                    <p>
+                        Your UTR
+                        <strong>{{ booking.utr_number }}</strong>
+                        has been submitted.
+                        Our admin team will verify the payment.
+                    </p>
+
+                    <a
+                        class="payment-button"
+                        href="/dashboard"
+                    >
+                        Go to Dashboard →
+                    </a>
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+        <aside class="payment-sidebar">
+
+            <!-- PRICE -->
+            <div class="price-card">
+
+                <span class="small-label">
+                    AMOUNT TO PAY
+                </span>
+
+                <div class="main-price">
+                    ₹{{ amount }}
+                </div>
+
+                <div class="price-line"></div>
+
+                <div class="price-row">
+                    <span>Rental amount</span>
+                    <strong>₹{{ booking.total_price }}</strong>
+                </div>
+
+                {% if booking.deposit %}
+
+                <div class="price-row">
+                    <span>Security deposit</span>
+                    <strong>₹{{ booking.deposit }}</strong>
+                </div>
+
+                <p class="deposit-note">
+                    Security deposit is refundable.
+                </p>
+
+    {% endif %}
+
+            </div>
+
+
+            <!-- TRUST -->
+            <div class="trust-card">
+
+                <span class="small-label">
+                    DRIVE EASY SECURITY
+                </span>
+
+                <div class="trust-item">
+                    <span>✓</span>
+                    <p>Secure UPI payment</p>
+                </div>
+
+                <div class="trust-item">
+                    <span>✓</span>
+                    <p>Booking confirmation after verification</p>
+                </div>
+
+                <div class="trust-item">
+                    <span>✓</span>
+                    <p>Transparent rental pricing</p>
+                </div>
+
+                <div class="trust-item">
+                    <span>✓</span>
+                    <p>Refundable security deposit</p>
+                </div>
+
+            </div>
+
+
+            <!-- HELP -->
+            <div class="help-card">
+
+                <span class="small-label">
+                    NEED HELP?
+                </span>
+
+                <h3>Payment issue?</h3>
+
+                <p>
+                    If your payment was successful but you
+                    are unsure about the transaction ID,
+                    keep your UPI receipt and contact DriveEasy.
+                </p>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Verify payments{% endblock %}
+{% block content %}
+<h2>Payments to verify</h2>
+<p class="muted">Check the UTR in your bank / UPI app, then approve or reject.</p>
+{% if rows %}
+<div class="table-wrap">
+<table>
+    <tr><th>#</th><th>User</th><th>Car</th><th>Amount</th><th>UTR</th><th></th></tr>
+    {% for r in rows %}
+    <tr>
+        <td>{{ r.id }}</td>
+        <td>{{ r.user_name }}<br><span class="muted">{{ r.user_phone }}</span></td>
+        <td>{{ r.car_brand }} {{ r.car_name }}<br><span class="muted">{{ r.start_datetime }} &rarr; {{ r.end_datetime }}</span></td>
+        <td>&#8377;{{ r.total_price + (r.deposit or 0) }}{% if r.deposit %}<br><span class="muted">incl. deposit &#8377;{{ r.deposit }}</span>{% endif %}</td>
+        <td><strong>{{ r.utr_number }}</strong></td>
+        <td class="actions">
+            <form method="POST" action="/admin/payment/{{ r.id }}/approve"><button class="btn btn-small" type="submit">Approve</button></form>
+            <a class="btn btn-small btn-danger" href="/admin/payment/{{ r.id }}/reject">Reject</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+{% else %}
+<p class="muted">Nothing waiting for verification.</p>
+{% endif %}
+
+<h2 class="space-top">E-bike ride payments to verify</h2>
+{% if ride_rows %}
+<div class="table-wrap"><table>
+    <tr><th>Ride</th><th>Rider</th><th>E-bike</th><th>Amount</th><th>UTR</th><th></th></tr>
+    {% for x in ride_rows %}
+    <tr>
+        <td>#{{ x.id }}</td>
+        <td>{{ x.user_name }}<br><span class="muted">{{ x.user_phone }}</span></td>
+        <td>{{ x.car_name }}<br><span class="muted">{{ x.minutes }} min</span></td>
+        <td>&#8377;{{ x.ride_amount + x.zone_fee }}</td>
+        <td><strong>{{ x.utr_number }}</strong></td>
+        <td class="actions">
+            <form method="POST" action="/admin/ride-payment/{{ x.id }}/approve"><button class="btn btn-small" type="submit">Approve</button></form>
+            <a class="btn btn-small btn-danger" href="/admin/ride-payment/{{ x.id }}/reject">Reject</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table></div>
+{% else %}<p class="muted">No ride payments waiting.</p>{% endif %}
+
+<h2 class="space-top">Recently confirmed</h2>
+{% if confirmed %}
+<div class="table-wrap">
+<table>
+    <tr><th>#</th><th>Customer</th><th>Car</th><th>Amount</th><th></th></tr>
+    {% for c in confirmed %}
+    {% set wa = 'Hello ' ~ c.user_name ~ ', your DriveEasy booking #' ~ c.id ~ ' for ' ~ c.car_brand ~ ' ' ~ c.car_name ~ ' is confirmed. Pickup: ' ~ c.start_datetime ~ ' | Return: ' ~ c.end_datetime ~ ' | Car passport: ' ~ base ~ '/passport/' ~ c.qr_token ~ ' | Invoice PDF: ' ~ base ~ '/invoice/share/' ~ share_token(c.id) ~ '.pdf' %}
+    <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.user_name }}<br><span class="muted">{{ c.user_phone }}</span></td>
+        <td>{{ c.car_brand }} {{ c.car_name }}</td>
+        <td>&#8377;{{ c.total_price }}</td>
+        <td class="actions">
+            <a class="btn btn-small" href="/invoice/{{ c.id }}.pdf?download=1">Invoice PDF</a>
+            <form method="POST" action="/invoice/{{ c.id }}/email"><button class="btn btn-small btn-outline" type="submit">Email</button></form>
+            <a class="btn btn-small btn-outline" target="_blank" rel="noopener" href="https://wa.me/91{{ c.user_phone }}?text={{ wa|urlencode }}">WhatsApp</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+</div>
+{% else %}
+<p class="muted">No confirmed bookings yet.</p>
+{% endif %}
+{% endblock %}

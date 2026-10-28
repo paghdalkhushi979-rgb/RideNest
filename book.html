@@ -1,0 +1,586 @@
+{% extends "base.html" %}
+
+{% block title %}Book {{ car.brand }} {{ car.name }} | DriveEase{% endblock %}
+
+{% block content %}
+
+<section class="booking-page">
+
+    <a href="{{ url_for('car_detail', car_id=car.id) }}" class="booking-back">
+        ← Back to {{ car.brand }} {{ car.name }}
+    </a>
+
+    <div class="booking-layout">
+
+        <!-- LEFT SIDE -->
+        <div class="booking-main">
+
+            <div class="booking-heading">
+                <p class="booking-eyebrow">DRIVEEASE BOOKING</p>
+
+                <h1>
+                    Plan your
+                    <span>next journey.</span>
+                </h1>
+
+                <p>
+                    Choose your dates, trip type and preferences.
+                    We'll calculate your rental price instantly.
+                </p>
+            </div>
+
+
+            <!-- CAR MINI CARD -->
+
+            <div class="booking-car-card">
+
+                <div class="booking-car-image">
+
+                    {% if car.image and car.image != 'default.jpg' %}
+
+                    <img
+                        src="{{ url_for('static', filename='images/cars/' ~ car.image) }}"
+                        alt="{{ car.brand }} {{ car.name }}"
+                    >
+
+                    {% else %}
+
+                    <div class="booking-car-placeholder">
+                        {{ car.brand[0] }}{{ car.name[0] }}
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+                <div class="booking-car-info">
+
+                    <small>YOUR SELECTED VEHICLE</small>
+
+                    <h2>
+                        {{ car.brand }} {{ car.name }}
+                    </h2>
+
+                    <div class="booking-car-meta">
+                        <span>{{ car.type }}</span>
+                        <span>{{ car.fuel }}</span>
+                        <span>{{ car.seats }} Seats</span>
+                    </div>
+
+                    <div class="booking-price">
+
+                        <strong>
+                            ₹{{ car.price_per_day }}
+                        </strong>
+
+                        <span>/ day</span>
+
+                        {% if car.price_per_hour %}
+                        <span class="price-divider">•</span>
+                        <strong class="hourly-price">
+                            ₹{{ car.price_per_hour }}
+                        </strong>
+                        <span>/ hour</span>
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- BOOKING FORM -->
+
+            <div class="booking-card">
+
+                <div class="booking-card-heading">
+
+                    <div class="booking-step">
+                        01
+                    </div>
+
+                    <div>
+                        <h2>Choose your dates</h2>
+                        <p>
+                            Tell us when your journey starts and ends.
+                        </p>
+                    </div>
+
+                </div>
+
+
+    <form method="POST">
+
+                    <div class="booking-date-grid">
+
+                        <div class="booking-field">
+
+                            <label>
+                                Pickup date & time
+                            </label>
+
+                            <input
+                                type="datetime-local"
+                                name="start"
+                                min="{{ now }}"
+                                value="{{ start or '' }}"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="booking-field">
+
+                            <label>
+                                Return date & time
+                            </label>
+
+                            <input
+                                type="datetime-local"
+                                name="end"
+                                min="{{ now }}"
+                                value="{{ end or '' }}"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+        {% if car.outstation_rate %}
+
+                    <div class="booking-divider"></div>
+
+                    <div class="booking-card-heading">
+
+                        <div class="booking-step">
+                            02
+        </div>
+
+                        <div>
+                            <h2>Choose your trip</h2>
+                            <p>
+                                Select where you're planning to drive.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="trip-options">
+
+                        <label class="trip-option">
+
+                            <input
+                                type="radio"
+                                name="trip_type"
+                                value="Local"
+                                {% if trip_type != 'Outstation' %}checked{% endif %}
+                            >
+
+                            <span class="trip-option-box">
+
+                                <span class="trip-icon">
+                                    🏙
+                                </span>
+
+                                <span>
+                                    <strong>Local</strong>
+                                    <small>
+                                        Drive within the city
+                                    </small>
+                                </span>
+
+                            </span>
+
+                        </label>
+
+
+                        <label class="trip-option">
+
+                            <input
+                                type="radio"
+                                name="trip_type"
+                                value="Outstation"
+                                {% if trip_type == 'Outstation' %}checked{% endif %}
+                            >
+
+                            <span class="trip-option-box">
+
+                                <span class="trip-icon">
+                                    🛣
+                                </span>
+
+                                <span>
+                                    <strong>Outstation</strong>
+                                    <small>
+                                        Travel outside the city
+                                    </small>
+                                </span>
+
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="booking-field destination-field">
+
+                        <label>
+                            Destination
+                            <span>(only for outstation)</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            name="destination"
+                            maxlength="60"
+                            value="{{ destination or '' }}"
+                            placeholder="e.g. Udaipur, Mumbai"
+                        >
+
+                    </div>
+
+
+                    <div class="outstation-note">
+
+                        <strong>Outstation pricing</strong>
+
+                        <span>
+                            ₹{{ car.outstation_rate }}/day ·
+                            {{ car.km_per_day }} km/day included ·
+                            ₹{{ car.extra_km_rate }}/km extra
+                        </span>
+
+                        <small>
+                            Admin approval is required before payment.
+                        </small>
+
+                    </div>
+
+        {% endif %}
+
+
+                    <div class="booking-divider"></div>
+
+
+                    <div class="booking-card-heading">
+
+                        <div class="booking-step">
+                            03
+                        </div>
+
+                        <div>
+                            <h2>Apply a coupon</h2>
+                            <p>
+                                Have a discount code? Use it here.
+                            </p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="coupon-row">
+
+                        <input
+                            type="text"
+                            name="coupon"
+                            value="{{ coupon or '' }}"
+                            placeholder="Enter coupon code"
+                            maxlength="15"
+                        >
+
+                    </div>
+
+
+                    <!-- PRICE SUMMARY -->
+
+        {% if preview %}
+
+                    <div class="booking-summary">
+
+                        <div class="summary-header">
+
+                            <span>PRICE SUMMARY</span>
+
+                            <span class="summary-check">
+                                ✓ Calculated
+                            </span>
+
+                        </div>
+
+
+                        <div class="summary-line">
+
+                            <span>
+                                {{ preview.note }}
+                            </span>
+
+                            <strong>
+                                ₹{{ preview.gross }}
+                            </strong>
+
+                        </div>
+
+
+                        {% if preview.discount %}
+
+                        <div class="summary-line discount-line">
+
+                            <span>
+                                Coupon discount
+                            </span>
+
+                            <strong>
+                                - ₹{{ preview.discount }}
+                            </strong>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        <div class="summary-total">
+
+                            <span>
+                                Rental total
+                            </span>
+
+                            <strong>
+                                ₹{{ preview.total }}
+                            </strong>
+
+                        </div>
+
+
+                        {% if preview.deposit %}
+
+                        <div class="deposit-line">
+
+                            <span>
+                                Refundable security deposit
+                            </span>
+
+                            <strong>
+                                ₹{{ preview.deposit }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="you-pay">
+
+                            <span>
+                                You pay
+                            </span>
+
+                            <strong>
+                                ₹{{ preview.total + preview.deposit }}
+                            </strong>
+
+                        </div>
+
+                        {% endif %}
+
+
+                        {% if trip_type == 'Outstation' %}
+
+                        <div class="km-note">
+
+                            {{ preview.km_limit }} km included.
+                            Admin approval is required before payment.
+
+                        </div>
+
+                        {% endif %}
+
+        </div>
+
+        {% else %}
+
+                    <div class="empty-summary">
+
+                        <span class="empty-summary-icon">
+                            ₹
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Your price will appear here
+                            </strong>
+
+                            <p>
+                                Choose your pickup and return time,
+                                then click <b>Check Price</b>.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+        {% endif %}
+
+
+                    <!-- ACTIONS -->
+
+                    <div class="booking-actions">
+
+                        <button
+                            class="check-price-btn"
+                            type="submit"
+                            name="action"
+                            value="preview"
+                        >
+                            Check Price
+                        </button>
+
+
+                        <button
+                            class="confirm-booking-btn"
+                            type="submit"
+                            name="action"
+                            value="book"
+                        >
+                            Confirm Booking
+                            <span>→</span>
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT SIDE -->
+
+        <aside class="booking-side">
+
+            <div class="booking-trust-card">
+
+                <p class="booking-eyebrow">
+                    WHY DRIVE WITH US
+                </p>
+
+                <h3>
+                    Simple booking.<br>
+                    Better journeys.
+                </h3>
+
+
+                <div class="trust-item">
+
+                    <span class="trust-icon">
+                        ✓
+                    </span>
+
+                    <div>
+                        <strong>
+                            Clear pricing
+                        </strong>
+
+                        <small>
+                            No hidden rental surprises.
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="trust-item">
+
+                    <span class="trust-icon">
+                        ✓
+                    </span>
+
+                    <div>
+                        <strong>
+                            Verified vehicles
+                        </strong>
+
+                        <small>
+                            Every vehicle is checked.
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="trust-item">
+
+                    <span class="trust-icon">
+                        ✓
+                    </span>
+
+                    <div>
+                        <strong>
+                            Flexible rentals
+                        </strong>
+
+                        <small>
+                            Choose dates that work for you.
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="trust-item">
+
+                    <span class="trust-icon">
+                        ✓
+                    </span>
+
+                    <div>
+                        <strong>
+                            Secure booking
+                        </strong>
+
+                        <small>
+                            Your booking details stay protected.
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="booking-help-card">
+
+                <span class="help-label">
+                    NEED HELP?
+                </span>
+
+                <h3>
+                    Planning a longer trip?
+                </h3>
+
+                <p>
+                    Check the vehicle details and availability
+                    before confirming your booking.
+                </p>
+
+                <a
+                    href="{{ url_for('car_detail', car_id=car.id) }}"
+                >
+                    View vehicle details →
+                </a>
+
+            </div>
+
+        </aside>
+
+</div>
+
+</section>
+
+{% endblock %}

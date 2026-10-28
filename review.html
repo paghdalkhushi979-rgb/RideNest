@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Rate your trip{% endblock %}
+{% block content %}
+<div class="form-box">
+    <h2>Rate {{ b.car_brand }} {{ b.car_name }}</h2>
+    <p class="muted">Booking #{{ b.id }}</p>
+    <form method="POST">
+        <label>Rating</label>
+        <select name="rating" required>
+            <option value="">Select</option>
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Good</option>
+            <option value="3">3 - Okay</option>
+            <option value="2">2 - Poor</option>
+            <option value="1">1 - Bad</option>
+        </select>
+        <label>Comment (optional)</label>
+        <textarea name="comment" rows="4" maxlength="300"></textarea>
+        <button class="btn" type="submit">Submit review</button>
+    </form>
+</div>
+{% endblock %}

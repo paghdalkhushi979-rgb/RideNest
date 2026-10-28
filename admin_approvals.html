@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Outstation approvals{% endblock %}
+{% block content %}
+<h2>Outstation approvals</h2>
+<p class="muted">Check the customer and destination. After you approve, the customer gets {{ window }} minutes to pay.</p>
+{% if rows %}
+<div class="table-wrap"><table>
+    <tr><th>#</th><th>Customer</th><th>Vehicle</th><th>Trip</th><th>Amount</th><th></th></tr>
+    {% for r in rows %}
+    <tr>
+        <td>{{ r.id }}</td>
+        <td>{{ r.user_name }}<br><span class="muted">{{ r.user_phone }}</span></td>
+        <td>{{ r.car_brand }} {{ r.car_name }}<br><span class="muted">{{ r.number_plate }}</span></td>
+        <td><strong>{{ r.destination }}</strong><br>{{ r.start_datetime }} &rarr; {{ r.end_datetime }}<br><span class="muted">{{ r.km_limit }} km included, extra &#8377;{{ r.extra_km_rate }}/km</span></td>
+        <td>&#8377;{{ r.total_price }}<br><span class="muted">+ &#8377;{{ r.deposit }} deposit</span></td>
+        <td class="actions">
+            <form method="POST" action="/admin/approval/{{ r.id }}/approve"><button class="btn btn-small" type="submit">Approve</button></form>
+            <a class="btn btn-small btn-danger" href="/admin/approval/{{ r.id }}/reject">Reject</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table></div>
+{% else %}
+<p class="muted">No outstation requests waiting.</p>
+{% endif %}
+{% endblock %}

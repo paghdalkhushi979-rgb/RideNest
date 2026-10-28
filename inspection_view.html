@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Checklist #{{ b.id }}{% endblock %}
+{% block content %}
+<h2>Checklist &middot; booking #{{ b.id }}</h2>
+<p class="muted">{{ b.car_brand }} {{ b.car_name }} ({{ b.number_plate }}) &middot; {{ b.user_name }}</p>
+
+<div class="two-col">
+    {% for title, i in [('Pickup', pickup), ('Return', ret)] %}
+    <div class="card">
+        <h3>{{ title }}</h3>
+        {% if i %}
+        <table class="spec">
+            <tr><th>Fuel / battery</th><td>{{ fuel_levels[i.fuel_level] }}</td></tr>
+            <tr><th>Odometer</th><td>{{ i.odometer }} km</td></tr>
+            {% if b.category in ('Scooter', 'Bike') %}<tr><th>Helmets</th><td>{{ i.helmets }}</td></tr>{% endif %}
+            <tr><th>Notes</th><td>{{ i.notes or '-' }}</td></tr>
+            <tr><th>Checked on</th><td>{{ i.created_at[:16] }} (UTC)</td></tr>
+        </table>
+        <div class="photo-grid">
+            {% for p in photos.get(i.id, []) %}
+            <a href="/media/{{ p.filename }}" target="_blank" rel="noopener"><img class="thumb big" src="/media/{{ p.filename }}" alt="{{ p.label }}"><span class="muted">{{ p.label }}</span></a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="muted">Not done yet.</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+{% if ret %}
+<h3>Charges</h3>
+<div class="table-wrap"><table>
+    {% if pickup %}<tr><th>Km driven</th><td>{{ ret.odometer - pickup.odometer }} km{% if b.km_limit %} (allowed {{ b.km_limit }}){% endif %}</td></tr>{% endif %}
+    <tr><th>Late fee</th><td>&#8377;{{ b.late_fee or 0 }}</td></tr>
+    <tr><th>Damage</th><td>&#8377;{{ b.damage_charge or 0 }}</td></tr>
+    <tr><th>Fuel</th><td>&#8377;{{ b.fuel_charge or 0 }}</td></tr>
+    <tr><th>Extra km</th><td>&#8377;{{ b.km_charge or 0 }}</td></tr>
+    {% if b.deposit %}
+    <tr><th>Security deposit</th><td>&#8377;{{ b.deposit }}</td></tr>
+    <tr><th>Deposit refund</th><td><strong>&#8377;{{ b.deposit_refund }}</strong></td></tr>
+    {% endif %}
+    {% if b.balance_due %}<tr><th>Balance to pay</th><td><strong>&#8377;{{ b.balance_due }}</strong></td></tr>{% endif %}
+</table></div>
+{% endif %}
+<p><a href="{% if session.role == 'admin' %}/admin/bookings{% else %}/dashboard{% endif %}">&larr; Back</a></p>
+{% endblock %}

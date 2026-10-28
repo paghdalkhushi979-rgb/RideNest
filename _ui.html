@@ -1,0 +1,70 @@
+{# ---------- reusable pieces (macros) ---------- #}
+
+{% macro wheel(cx, cy, r) -%}
+<circle cx="{{ cx }}" cy="{{ cy }}" r="{{ r + 5 }}" class="arch"/><circle cx="{{ cx }}" cy="{{ cy }}" r="{{ r }}" class="tyre"/><circle cx="{{ cx }}" cy="{{ cy }}" r="{{ (r * 0.58)|round|int }}" class="rim"/><circle cx="{{ cx }}" cy="{{ cy }}" r="{{ (r * 0.2)|round|int }}" class="hub"/>
+{%- endmacro %}
+
+{# A drawn illustration used when no photo has been uploaded. Colour changes with the vehicle id. #}
+{% macro art(category, vtype, seed=0, label='') -%}
+{%- set colors = ['#e63946', '#2f6fed', '#1d3557', '#f4a261', '#2a9d8f', '#7b5ea7', '#d9a406', '#3d405b'] -%}
+{%- set c = '#14b86b' if category == 'E-bike' else colors[seed % 8] -%}
+<svg class="art" viewBox="0 0 400 210" role="img" aria-label="{{ label or vtype }}" style="--body: {{ c }}">
+<ellipse cx="200" cy="192" rx="160" ry="7" class="shadow"/>
+{%- if category == 'E-bike' %}
+<g class="line"><path d="M100 163 L178 163 M100 163 L168 112 M168 112 L250 108 M178 163 L168 112 M178 163 L250 108 M250 108 L300 163"/></g>
+<rect x="190" y="126" width="54" height="17" rx="6" transform="rotate(-24 217 134)" class="body"/>
+<path d="M150 103 H186 Q192 108 186 113 H150 Z" class="dark"/><path d="M168 112 V104" class="line"/>
+<path d="M250 108 L242 90 M232 90 H258" class="line"/><circle cx="100" cy="163" r="10" class="body"/>
+<path d="M252 100 Q266 100 268 108 L254 110 Z" class="light"/>
+<g class="spokes"><circle cx="100" cy="163" r="26" class="tyre-o"/><circle cx="300" cy="163" r="26" class="tyre-o"/></g>
+<circle cx="100" cy="163" r="4" class="hub"/><circle cx="300" cy="163" r="4" class="hub"/>
+{%- elif category == 'Scooter' %}
+<path class="body" d="M62 160 Q56 124 98 114 L176 112 Q192 112 198 124 L208 150 H246 L260 106 Q264 94 278 94 H292 V110 H282 L274 150 Q272 160 258 160 H112 Q74 164 62 160 Z"/>
+<path d="M92 108 H178 Q190 108 190 116 H88 Q84 110 92 108 Z" class="dark"/>
+<path d="M290 106 L306 163" class="line"/><path d="M280 92 L266 84 H252 M280 92 H296" class="line"/>
+<path d="M290 88 Q306 90 308 100 L292 102 Z" class="light"/>
+<path d="M88 146 Q116 124 144 146" class="fender"/><path d="M286 150 Q306 132 322 152" class="fender"/>
+{{ wheel(118, 166, 24) }}{{ wheel(306, 166, 24) }}
+{%- elif category == 'Bike' %}
+<path class="body" d="M148 106 Q168 86 218 96 L228 120 H150 Z"/>
+<path d="M92 112 Q122 100 150 106 V118 H88 Z" class="dark"/><path class="body" d="M70 120 Q88 102 112 108 L100 122 Z"/>
+<rect x="152" y="124" width="68" height="32" rx="6" class="dark"/><rect x="160" y="132" width="20" height="16" rx="3" class="rim"/>
+<path d="M86 152 H176" class="pipe"/><path d="M150 140 L100 164" class="line"/>
+<path d="M294 100 L308 163" class="line"/><path d="M292 96 L272 86 H260" class="line"/>
+<circle cx="308" cy="104" r="12" class="light"/><path d="M282 140 Q306 118 330 142" class="fender"/>
+{{ wheel(100, 163, 28) }}{{ wheel(308, 163, 28) }}
+{%- elif vtype == 'SUV' %}
+<path class="body" d="M44 168 V124 Q44 112 56 110 L78 106 L94 72 Q100 64 114 64 H258 Q272 64 280 76 L296 108 L340 114 Q360 118 362 146 V168 Z"/>
+<path d="M106 76 L92 106 H166 V76 Z M174 76 V106 H286 L272 78 Q270 76 264 76 Z" class="glass"/>
+<path d="M170 108 V164" class="seam"/><rect x="152" y="118" width="14" height="4" rx="2" class="seam-h"/><rect x="112" y="60" width="140" height="4" rx="2" class="dark"/>
+<path d="M334 124 L358 128 V140 H334 Z" class="light"/><rect x="44" y="130" width="9" height="14" rx="2" class="tail"/>
+{{ wheel(112, 162, 29) }}{{ wheel(292, 162, 29) }}
+{%- elif vtype == 'MUV' or vtype == 'Van' %}
+<path class="body" d="M34 168 V120 Q34 106 48 104 L70 100 L88 68 Q94 60 106 60 H268 Q282 60 290 72 L306 104 L346 110 Q362 114 364 144 V168 Z"/>
+<path d="M98 72 L82 100 H140 V72 Z M148 72 V100 H198 V72 Z M206 72 V100 H292 L276 74 Q274 72 268 72 Z" class="glass"/>
+<path d="M144 102 V164 M202 102 V164" class="seam"/><path d="M336 120 L360 124 V138 H336 Z" class="light"/><rect x="34" y="126" width="9" height="14" rx="2" class="tail"/>
+{{ wheel(104, 162, 28) }}{{ wheel(300, 162, 28) }}
+{%- elif vtype == 'Sedan' or vtype == 'Luxury' %}
+<path class="body" d="M38 168 V142 Q38 130 52 128 L92 122 L124 94 Q134 86 150 86 H236 Q254 86 264 98 L284 124 L340 130 Q364 134 366 154 V168 Z"/>
+<path d="M132 98 L110 122 H182 V98 Z M190 98 V122 H280 L258 100 Q254 98 248 98 Z" class="glass"/>
+<path d="M186 124 V164" class="seam"/><rect x="170" y="132" width="14" height="4" rx="2" class="seam-h"/>
+<path d="M338 136 L362 140 V150 H338 Z" class="light"/><rect x="38" y="134" width="9" height="12" rx="2" class="tail"/>
+{{ wheel(106, 163, 27) }}{{ wheel(298, 163, 27) }}
+{%- else %}
+<path class="body" d="M46 168 V136 Q46 124 56 120 L86 112 Q96 90 120 84 H216 Q238 84 252 100 L272 120 L324 126 Q354 130 356 150 V168 Z"/>
+<path d="M104 96 Q110 90 122 90 H160 V118 H92 Z M168 90 H214 Q228 90 238 102 L254 118 H168 Z" class="glass"/>
+<path d="M164 120 V164" class="seam"/><rect x="148" y="130" width="13" height="4" rx="2" class="seam-h"/>
+<path d="M328 132 L352 136 V148 H328 Z" class="light"/><rect x="46" y="130" width="9" height="12" rx="2" class="tail"/>
+{{ wheel(110, 163, 27) }}{{ wheel(290, 163, 27) }}
+{%- endif %}
+</svg>
+{%- endmacro %}
+
+{# Real photo if one was uploaded, otherwise the illustration. #}
+{% macro media(image, category, vtype, seed, alt) -%}
+{%- if image and image != 'default.jpg' -%}
+<img src="{{ url_for('static', filename='images/cars/' ~ image) }}" alt="{{ alt }}" loading="lazy">
+{%- else -%}{{ art(category, vtype, seed, alt) }}{%- endif -%}
+{%- endmacro %}
+
+{% macro stars(n) -%}{{ '★' * n }}{{ '☆' * (5 - n) }}{%- endmacro %}

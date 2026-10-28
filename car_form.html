@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}{% if editing %}Edit car{% else %}Add car{% endif %}{% endblock %}
+{% block content %}
+{% set c = car or {} %}
+<div class="form-box wide">
+    <h2>{% if editing %}Edit car{% else %}Add new car{% endif %}</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-grid">
+            <div><label>Name</label><input type="text" name="name" value="{{ c.name or '' }}" required></div>
+            <div><label>Brand</label><input type="text" name="brand" value="{{ c.brand or '' }}" required></div>
+            <div><label>Category</label>
+                <select name="category">{% for value, label in categories %}<option value="{{ value }}" {% if (c.category or 'Car') == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div><label>Parking zone (e-bikes only)</label>
+                <select name="station"><option value="">-</option>{% for z in zones %}<option value="{{ z }}" {% if c.station == z %}selected{% endif %}>{{ z }}</option>{% endfor %}</select></div>
+            <div><label>Type</label>
+                <select name="type">{% for t in types %}<option {% if c.type == t %}selected{% endif %}>{{ t }}</option>{% endfor %}</select></div>
+            <div><label>Fuel</label>
+                <select name="fuel">{% for f in fuels %}<option {% if c.fuel == f %}selected{% endif %}>{{ f }}</option>{% endfor %}</select></div>
+            <div><label>Seats</label><input type="number" name="seats" min="1" max="12" value="{{ c.seats or 5 }}" required></div>
+            <div><label>Price per day (&#8377;)</label><input type="number" name="price_per_day" min="1" value="{{ c.price_per_day or '' }}" required></div>
+            <div><label>Price per hour (&#8377;) - 0 = no hourly</label><input type="number" name="price_per_hour" min="0" value="{{ c.price_per_hour or 0 }}"></div>
+            <div><label>Minimum hours</label><input type="number" name="min_hours" min="1" max="24" value="{{ c.min_hours or 1 }}"></div>
+            <div><label>Outstation rate per day (&#8377;) - 0 = not allowed</label><input type="number" name="outstation_rate" min="0" value="{{ c.outstation_rate or 0 }}"></div>
+            <div><label>Km included per day</label><input type="number" name="km_per_day" min="0" value="{{ c.km_per_day or 0 }}"></div>
+            <div><label>Extra km charge (&#8377; per km)</label><input type="number" name="extra_km_rate" min="0" value="{{ c.extra_km_rate or 0 }}"></div>
+            <div><label>Security deposit (&#8377;)</label><input type="number" name="deposit" min="0" value="{{ c.deposit or 0 }}"></div>
+            <div><label>Number plate</label><input type="text" name="number_plate" value="{{ c.number_plate or '' }}" required></div>
+            <div><label>Kilometres driven</label><input type="number" name="km_driven" min="0" value="{{ c.km_driven or 0 }}"></div>
+            <div><label>Insurance expiry</label><input type="date" name="insurance_expiry" value="{{ c.insurance_expiry or '' }}"></div>
+            <div><label>PUC expiry</label><input type="date" name="puc_expiry" value="{{ c.puc_expiry or '' }}"></div>
+            <div><label>Last service</label><input type="date" name="last_service" value="{{ c.last_service or '' }}"></div>
+        </div>
+        <label>Car photo (JPG, PNG or WEBP)</label>
+        {% if editing and c.image and c.image != 'default.jpg' %}
+        <img class="thumb current" src="{{ url_for('static', filename='images/cars/' ~ c.image) }}" alt="Current photo">
+        <p class="muted">Choose a new file only if you want to replace this photo.</p>
+        {% endif %}
+        <input type="file" name="photo" accept="image/png, image/jpeg, image/webp">
+
+        <button class="btn" type="submit">{% if editing %}Save changes{% else %}Add car{% endif %}</button>
+    </form>
+    {% if not editing %}<p class="muted">A unique QR token is created automatically.</p>{% endif %}
+</div>
+{% endblock %}
