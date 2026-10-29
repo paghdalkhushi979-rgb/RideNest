@@ -7,15 +7,15 @@
 
 <!-- ================= HERO ================= -->
 <section class="de-hero">
-   <style>
-section.de-hero {
-    background:
-        linear-gradient(rgba(20,25,18,0.35), rgba(20,25,18,0.55)),
-        url("{{ url_for('static', filename='images/cars/hero-car.jpg') }}")
-        center center / cover no-repeat !important;
-    min-height: 550px;
-}
-</style>
+   <div style="
+    position: absolute;
+    inset: 0;
+    background-image: url('{{ url_for('static', filename='images/cars/hero-car.jpg') }}');
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    pointer-events: none;
+"></div>
 
     <div class="de-hero-content" style="
         width: 100%;
