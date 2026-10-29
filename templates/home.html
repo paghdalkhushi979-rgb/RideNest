@@ -7,15 +7,14 @@
 
 <!-- ================= HERO ================= -->
 <section class="de-hero">
-    <style>
-    .de-hero {
-        background-image:
-            linear-gradient(rgba(20, 25, 18, 0.48), rgba(20, 25, 18, 0.62)),
-            url("{{ url_for('static', filename='images/cars/hero-car.jpg') }}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-    }
+   <style>
+section.de-hero {
+    background:
+        linear-gradient(rgba(20,25,18,0.35), rgba(20,25,18,0.55)),
+        url("{{ url_for('static', filename='images/cars/hero-car.jpg') }}")
+        center center / cover no-repeat !important;
+    min-height: 550px;
+}
 </style>
 
     <div class="de-hero-content" style="
